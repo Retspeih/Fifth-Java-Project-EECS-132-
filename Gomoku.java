@@ -32,11 +32,11 @@ public class Gomoku extends Application {
   /**
    * Constructor that initializes the dimensions of the game
    */
-  public Gomoku(int rows, int columns) {
+  /*public Gomoku(int rows, int columns) {
     this.rows = rows;
     this.columns = columns;
     gameBoard = new int[rows][columns];
-  }
+  }*/
   
   /**
    * Getter method for the amount of rows
