@@ -111,6 +111,14 @@ public class Gomoku extends Application {
     buttonBoard = new Button[getRows()][getColumns()];
   }
   
+  /**
+   * Getter method for the int board
+   * @return the array containing the values on the board
+   */
+  public int[][] getArr() {
+    return gameBoard;
+  }
+  
   /** 
    * Overrides the start method of Application to create the GUI with one button in the center of the main window.
    * @param primaryStage the JavaFX main window
@@ -143,6 +151,19 @@ public class Gomoku extends Application {
     primaryStage.show();
   }
   
+  /**
+   * Reads the array as inputs come in
+   */
+  public int[][] readArr() {
+    for(int i = 0; i < gameBoard.length; i++) {
+      for(int j = 0; j < gameBoard[i].length; j++) {
+        System.out.print(gameBoard[i][j] + " ");
+      }
+      System.out.println();
+    }
+    return gameBoard;
+  }
+  
   private class buttonClick implements EventHandler<ActionEvent> {
     
     
@@ -161,6 +182,9 @@ public class Gomoku extends Application {
       }
       button.setDisable(true);
       button.setOpacity(100);
+      CheckArrays c = new CheckArrays();
+      c.numberInLine(getArr(), row, column, 5);
+      //readArr();
     }
   }
   
