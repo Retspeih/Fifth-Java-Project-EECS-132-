@@ -32,11 +32,11 @@ public class Gomoku extends Application {
   /**
    * Constructor that initializes the dimensions of the game
    */
-  /*public Gomoku(int rows, int columns) {
+  public Gomoku(int rows, int columns) {
     this.rows = rows;
     this.columns = columns;
     gameBoard = new int[rows][columns];
-  }*/
+  }
   
   /**
    * Getter method for the amount of rows
@@ -75,6 +75,12 @@ public class Gomoku extends Application {
    * @param args The command line arguments that will be passed onto the JavaFX application
    */
   public static void main(String[] args) {
+    if (args.length > 2) {
+      Gomoku newGame = new Gomoku(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+    }
+    else {
+      Gomoku newGame = new Gomoku(19,19);
+    }
     Application.launch(args);
   }
   
