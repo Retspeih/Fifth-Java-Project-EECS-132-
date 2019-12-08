@@ -46,6 +46,11 @@ public class Gomoku extends Application {
   private Color color = Color.BLACK;
   
   /**
+   * Stores the amount of pieces necessary to win the game
+   */
+  private int win;
+  
+  /**
    * Constructor that initializes the dimensions of the game
    */
   /*public Gomoku(int rows, int columns) {
@@ -119,19 +124,78 @@ public class Gomoku extends Application {
     return gameBoard;
   }
   
+  /**
+   * Getter method for the button board
+   * @return the array containing the buttons on the board
+   */
+  public Button[][] getButtonArr() {
+    return buttonBoard;
+  }
+  
+  /**
+   * Getter method for the wins
+   * @return the amount of pieces necessary to win the game
+   */
+  public int getWin() {
+    return win;
+  }
+  
+  /**
+   * When a winner has been decided, the buttons are disabled
+   */
+  public void disableArray() {
+    for(int i = 0; i < getRows(); i++) {
+      for(int j = 0; j < getColumns(); j++) {
+        getButtonArr()[i][j].setDisable(true);
+      }
+    }
+  }
+  
+  /**
+   * Setter method for the amount of wins
+   * @param win represents the amount of pieces needed to win the game
+   */
+  public void setWin(int win) {
+    this.win = win;
+  }
+  
   /** 
    * Overrides the start method of Application to create the GUI with one button in the center of the main window.
    * @param primaryStage the JavaFX main window
    */
   public void start(Stage primaryStage) {
-    setRows(19);
+    /*setRows(19);
     setColumns(19);
+    setWin(5);*/
     
-    initBoards();
+    if (getParameters().getRaw().size() > 2) { // if the command line arguments are greater than 2, read each value into the win, rows, and columns
+      setWin(Integer.parseInt(getParameters().getRaw().get(0)));
+      setRows(Integer.parseInt(getParameters().getRaw().get(1)));
+      setColumns(Integer.parseInt(getParameters().getRaw().get(2)));
+    }
+    else if (getParameters().getRaw().size() == 2) { // if the command line arguments are exactly 2, set win to 5 and set rows and columns to the arguments
+      setWin(5);
+      setRows(Integer.parseInt(getParameters().getRaw().get(0)));
+      setColumns(Integer.parseInt(getParameters().getRaw().get(1)));
+    }
+    else if (getParameters().getRaw().size() == 1) { // if the command line arguments are exactly 1, set win to the first argument and set rows and columns to a default of 19
+      setWin(Integer.parseInt(getParameters().getRaw().get(0)));
+      setRows(19);
+      setColumns(19);
+    }
+    else { // if there are no command line arguments, the wins, rows, and columns are set to default values of 5, 19, and 19 respectively
+      setWin(5);
+      setRows(19);
+      setColumns(19);
+    }
+    
+    initBoards(); // initialize the size of the arrays
     
     GridPane gridPane = new GridPane();
-    
+    // runs through the rows of the array
     for(int i = 0; i < buttonBoard.length; i++) {
+      // runs through the columns of the array
+      // initializes each button in the array and adds them to the grid pane
       for(int j = 0; j < buttonBoard[i].length; j++) {
         
         buttonBoard[i][j] = new Button();
@@ -144,24 +208,11 @@ public class Gomoku extends Application {
       }
     }
     
-    Scene scene = new Scene(gridPane);
+    Scene scene = new Scene(gridPane); // adds the gridPane to the scene
     
-    primaryStage.setTitle("Gomoku");
-    primaryStage.setScene(scene);
-    primaryStage.show();
-  }
-  
-  /**
-   * Reads the array as inputs come in
-   */
-  public int[][] readArr() {
-    for(int i = 0; i < gameBoard.length; i++) {
-      for(int j = 0; j < gameBoard[i].length; j++) {
-        System.out.print(gameBoard[i][j] + " ");
-      }
-      System.out.println();
-    }
-    return gameBoard;
+    primaryStage.setTitle("Gomoku"); // name of the game
+    primaryStage.setScene(scene); // sets the appropriate scene
+    primaryStage.show(); // shows the scene
   }
   
   private class buttonClick implements EventHandler<ActionEvent> {
@@ -169,22 +220,46 @@ public class Gomoku extends Application {
     
     public void handle(ActionEvent event) {
       Button button = (Button)event.getSource();
+      CheckArrays f = new CheckArrays();
       int row = GridPane.getRowIndex(button);
       int column = GridPane.getColumnIndex(button);
-      button.setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(0), new Insets(1,1,1,1)), new BackgroundFill(color, new CornerRadii(18), new Insets(4,4,4,4))));
+      
       if (getColor().equals(Color.BLACK)) {
-        gameBoard[row][column] = 1;
-        setColor(Color.WHITE);
+        getArr()[row][column] = 1;
+        f.setPiece(1); // Piece that is being searched for matches
+        if(f.numberInLine(getArr(), row, column, getWin()) == 1) { // Declares black the winner and disables the board
+          button.setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(0), new Insets(1,1,1,1)), new BackgroundFill(getColor(), new CornerRadii(18), new Insets(4,4,4,4))));
+          System.out.println("Black Wins!!!");
+          disableArray();
+        }
+        else if(f.numberInLine(getArr(), row, column, getWin()) > 1 || f.numberInLine(getArr(), row, column, getWin() - 1) > 1) { // Prevents breaking the OverLine rule
+          ;
+        }
+        else { // Activate the button
+          getArr()[row][column] = 1;
+          button.setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(0), new Insets(1,1,1,1)), new BackgroundFill(getColor(), new CornerRadii(18), new Insets(4,4,4,4))));
+          setColor(Color.WHITE);
+        }
       }
       else {
-        gameBoard[row][column] = -1;
-        setColor(Color.BLACK);
+        f.setPiece(-1); // Piece that is being searched for matches
+        if(f.numberInLine(getArr(), row, column, getWin()) == 1) { // Declares white the winner and disables the board
+          button.setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(0), new Insets(1,1,1,1)), new BackgroundFill(getColor(), new CornerRadii(18), new Insets(4,4,4,4))));
+          System.out.println("White Wins!!!");
+          disableArray();
+        }
+        else if(f.numberInLine(getArr(), row, column, getWin()) > 1 || f.numberInLine(getArr(), row, column, getWin() - 1) > 1) { // Prevents breaking the OverLine rule
+          ;
+        }
+        else { // Activate the button
+          getArr()[row][column] = -1;
+          button.setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(0), new Insets(1,1,1,1)), new BackgroundFill(getColor(), new CornerRadii(18), new Insets(4,4,4,4))));
+          setColor(Color.BLACK);
+        }
       }
-      button.setDisable(true);
-      button.setOpacity(100);
-      CheckArrays f = new CheckArrays();
-      f.numberInLine(getArr(), row, column, 5);
-      //readArr();
+      
+      button.setDisable(true); // Prevents the button from being pressed again
+      button.setOpacity(100); // Stops the button from "graying out" when disabled
     }
   }
   
@@ -193,18 +268,7 @@ public class Gomoku extends Application {
    * @param args The command line arguments that will be passed onto the JavaFX application
    */
   public static void main(String[] args) {
-    /*if (args.length > 2) {
-     Gomoku newGame = new Gomoku();
-     newGame.setRows(Integer.parseInt(args[1]));
-     newGame.setColumns(Integer.parseInt(args[2]));
-     }
-     else {
-     Gomoku newGame = new Gomoku();
-     newGame.setRows(19);
-     newGame.setColumns(19);
-     }*/
-    Gomoku c = new Gomoku();
-    c.launch(args);
+    Application.launch(args);
   }
   
 }
