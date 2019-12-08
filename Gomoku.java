@@ -182,8 +182,8 @@ public class Gomoku extends Application {
       }
       button.setDisable(true);
       button.setOpacity(100);
-      CheckArrays c = new CheckArrays();
-      c.numberInLine(getArr(), row, column, 5);
+      CheckArrays f = new CheckArrays();
+      f.numberInLine(getArr(), row, column, 5);
       //readArr();
     }
   }
@@ -203,7 +203,8 @@ public class Gomoku extends Application {
      newGame.setRows(19);
      newGame.setColumns(19);
      }*/
-    Application.launch();
+    Gomoku c = new Gomoku();
+    c.launch(args);
   }
   
 }
