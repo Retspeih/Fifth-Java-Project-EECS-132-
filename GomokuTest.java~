@@ -1,0 +1,17 @@
+import org.junit.*;
+import static org.junit.Assert.*;
+
+
+public class GomokuTest {
+  
+  /**
+   * Tests the numberInLine method
+   */
+  @Test
+  public void testNumberInLine() {
+    int[][] test = { {1,1,1,1,0,1,1,1,1}, {0,0,0,0,1,0,0,0,0}, {0,0,0,0,1,0,0,0,0}, {0,0,0,0,1,0,0,0,0}, {0,0,0,0,1,0,0,0,0} };
+    CheckArrays c = new CheckArrays();
+    assertEquals(3, c.numberInLine(test, 0, 4, 5));
+  }
+  
+}

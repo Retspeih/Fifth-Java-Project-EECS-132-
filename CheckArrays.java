@@ -1,6 +1,7 @@
 
 /**
  * Checks an array
+ * @author Hiep Nguyen
  */
 public class CheckArrays {
   
@@ -13,6 +14,36 @@ public class CheckArrays {
    * Keeps track of the amount of consecutive pieces in a row
    */
   private int counter = 0;
+  
+  /**
+   * Checks if adjacent spots are open
+   * @param arr represents the board game
+   * @param row represents the row of the clicked button
+   * @param column represents the column of the clicked button
+   * @return true or false depending on if there are open adjacent spots on the board
+   */
+  public boolean isOpen(int[][] arr, int row, int column) {
+    
+    //setPiece(0);
+    
+    int takenSpaces = checkUp(arr, row, column) + checkDown(arr, row, column) + checkLeft(arr, row, column) + checkRight(arr, row, column)
+               + checkUpperRight(arr, row, column) + checkUpperLeft(arr, row, column) + checkBottomLeft(arr, row, column) + checkBottomRight(arr, row, column); // stores the amount of spaces taken, calculated
+    if (row > 0 && column > 0 && row < arr.length && column < arr[row].length && takenSpaces < 8) { // if the piece isn't on an edge, if it doesn't return 8 from the helper methods, it has an open space
+      return true;
+    }
+    else if (row == 0 || row == arr.length - 1 && takenSpaces < 5 && column != 0) { // if the piece is on an edge, it has an open space if the helper methods return a value less than 5
+      return true;
+    }
+    else if (column == 0 || column == arr[row].length - 1 && takenSpaces < 5 && row != 0) { // if the piece is on an edge, it has an open space if the helper methods return a value less than 5
+      return true;
+    }
+    else if ((row == 0 && column == 0) || (row == 0 && column == arr[row].length - 1) || (row == arr.length - 1 && column == 0) || (row == arr.length - 1 && column == arr[row].length - 1) && takenSpaces < 3) { // if the piece is in a corner,it has an open space if the helper methods return a value less than 3
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
   
   
   /**
@@ -58,7 +89,6 @@ public class CheckArrays {
       matchedLines++;
     }
     setCounter(0);
-    System.out.println(matchedLines);
     return matchedLines;
   }
   

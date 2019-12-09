@@ -14,9 +14,11 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.geometry.Insets;
 import javafx.scene.shape.Circle;
+import java.lang.NumberFormatException;
 
 /**
  * Creates the game Gomoku
+ * @author Hiep Nguyen
  */
 public class Gomoku extends Application {
   
@@ -50,14 +52,6 @@ public class Gomoku extends Application {
    */
   private int win;
   
-  /**
-   * Constructor that initializes the dimensions of the game
-   */
-  /*public Gomoku(int rows, int columns) {
-   this.rows = rows;
-   this.columns = columns;
-   gameBoard = new int[rows][columns];
-   }*/
   
   /**
    * Getter method for the amount of rows
@@ -164,10 +158,8 @@ public class Gomoku extends Application {
    * @param primaryStage the JavaFX main window
    */
   public void start(Stage primaryStage) {
-    /*setRows(19);
-    setColumns(19);
-    setWin(5);*/
     
+    try {
     if (getParameters().getRaw().size() > 2) { // if the command line arguments are greater than 2, read each value into the win, rows, and columns
       setWin(Integer.parseInt(getParameters().getRaw().get(0)));
       setRows(Integer.parseInt(getParameters().getRaw().get(1)));
@@ -200,8 +192,8 @@ public class Gomoku extends Application {
         
         buttonBoard[i][j] = new Button();
         buttonBoard[i][j].setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(0), new Insets(1,1,1,1))));
-        buttonBoard[i][j].setMaxSize(35, 35);
-        buttonBoard[i][j].setMinSize(35, 35);
+        buttonBoard[i][j].setMaxSize(44, 44);
+        buttonBoard[i][j].setMinSize(44, 44);
         buttonBoard[i][j].setOnAction(new buttonClick());
         
         gridPane.add(buttonBoard[i][j], i, j);
@@ -214,20 +206,29 @@ public class Gomoku extends Application {
     primaryStage.setScene(scene); // sets the appropriate scene
     primaryStage.show(); // shows the scene
   }
+    catch (NumberFormatException e) { // Catches if the inputted values are unparseable Strings
+      System.out.println("Input appropriate integer values into the command line");
+    }
+  }
   
   private class buttonClick implements EventHandler<ActionEvent> {
     
     
     public void handle(ActionEvent event) {
-      Button button = (Button)event.getSource();
-      CheckArrays f = new CheckArrays();
-      int row = GridPane.getRowIndex(button);
-      int column = GridPane.getColumnIndex(button);
+      Button button = (Button)event.getSource(); // stores the button that was pressed
+      CheckArrays f = new CheckArrays(); // used to check arrays
+      int row = GridPane.getRowIndex(button); // stores the row of the pressed button
+      int column = GridPane.getColumnIndex(button); // stores the column of the pressed button
       
       if (getColor().equals(Color.BLACK)) {
         getArr()[row][column] = 1;
-        f.setPiece(1); // Piece that is being searched for matches
+        f.setPiece(1); // piece that is being searched for matches
+        if(getWin() == 0 || getWin() == 1) {
+          disableArray();
+          System.out.println("Try putting realistc winning values sir");
+        }
         if(f.numberInLine(getArr(), row, column, getWin()) == 1) { // Declares black the winner and disables the board
+          f.isOpen(getArr(), row, column);
           button.setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(0), new Insets(1,1,1,1)), new BackgroundFill(getColor(), new CornerRadii(18), new Insets(4,4,4,4))));
           System.out.println("Black Wins!!!");
           disableArray();
@@ -236,14 +237,16 @@ public class Gomoku extends Application {
           ;
         }
         else { // Activate the button
-          getArr()[row][column] = 1;
           button.setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(0), new Insets(1,1,1,1)), new BackgroundFill(getColor(), new CornerRadii(18), new Insets(4,4,4,4))));
+          getArr()[row][column] = 1;
           setColor(Color.WHITE);
+          button.setDisable(true); // Prevents the button from being pressed again
         }
       }
       else {
         f.setPiece(-1); // Piece that is being searched for matches
         if(f.numberInLine(getArr(), row, column, getWin()) == 1) { // Declares white the winner and disables the board
+          f.isOpen(getArr(), row, column);
           button.setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(0), new Insets(1,1,1,1)), new BackgroundFill(getColor(), new CornerRadii(18), new Insets(4,4,4,4))));
           System.out.println("White Wins!!!");
           disableArray();
@@ -252,13 +255,13 @@ public class Gomoku extends Application {
           ;
         }
         else { // Activate the button
-          getArr()[row][column] = -1;
           button.setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(0), new Insets(1,1,1,1)), new BackgroundFill(getColor(), new CornerRadii(18), new Insets(4,4,4,4))));
+          getArr()[row][column] = -1;
           setColor(Color.BLACK);
+          button.setDisable(true); // Prevents the button from being pressed again
         }
       }
       
-      button.setDisable(true); // Prevents the button from being pressed again
       button.setOpacity(100); // Stops the button from "graying out" when disabled
     }
   }
